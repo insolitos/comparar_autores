@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador Literário</title>
+    <style>
+        .comp-literario-widget {
+            font-family: 'pt_europeu', 'Arial', 'Helvetica', sans-serif;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            display: inline-block;
+            background: #fff;
+            max-width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .comp-literario-widget:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .widget-texto {
+            color: #333;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        
+        .input-autor {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 14px;
+            width: 120px;
+            margin: 0 4px;
+            font-family: inherit;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .input-autor:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .input-autor::placeholder {
+            color: #999;
+        }
+        
+        .btn-comparar {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 8px;
+            font-family: inherit;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        
+        .btn-comparar:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+        
+        .btn-comparar:active {
+            transform: translateY(0);
+        }
+        
+        .btn-comparar:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            .comp-literario-widget {
+                padding: 12px;
+                text-align: center;
+            }
+            
+            .input-autor {
+                width: 100px;
+                margin: 2px;
+            }
+            
+            .btn-comparar {
+                margin-left: 4px;
+                margin-top: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="comp-literario-widget">
+        <span class="widget-texto">Que autores </span>
+        <input type="text" id="autor1-comp-lit" placeholder="Autor 1" class="input-autor" maxlength="50">
+        <span class="widget-texto"> e </span>
+        <input type="text" id="autor2-comp-lit" placeholder="Autor 2" class="input-autor" maxlength="50">
+        <span class="widget-texto"> desejas comparar literariamente? </span>
+        <button onclick="abrirComparacao()" class="btn-comparar">Comparar</button>
+        
+        <div id="error-message" class="error-message">
+            Por favor, introduza ambos os autores.
+        </div>
+    </div>
+
+    <script>
+        function abrirComparacao() {
+            const autor1Input = document.getElementById('autor1-comp-lit');
+            const autor2Input = document.getElementById('autor2-comp-lit');
+            const errorMessage = document.getElementById('error-message');
+            const btnComparar = document.querySelector('.btn-comparar');
+            
+            const autor1 = autor1Input.value.trim();
+            const autor2 = autor2Input.value.trim();
+            
+            // Limpar mensagem de erro anterior
+            errorMessage.style.display = 'none';
+            
+            // Validação
+            if (!autor1 || !autor2) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Por favor, introduza ambos os autores.';
+                
+                // Destacar campos vazios
+                if (!autor1) autor1Input.style.borderColor = '#d32f2f';
+                if (!autor2) autor2Input.style.borderColor = '#d32f2f';
+                
+                return;
+            }
+            
+            if (autor1.toLowerCase() === autor2.toLowerCase()) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Por favor, escolha dois autores diferentes.';
+                return;
+            }
+            
+            // Resetar estilos dos inputs
+            autor1Input.style.borderColor = '#ccc';
+            autor2Input.style.borderColor = '#ccc';
+            
+            // Feedback visual durante o carregamento
+            btnComparar.disabled = true;
+            btnComparar.textContent = 'Abrindo...';
+            
+            const prompt = `Escreve uma análise comparativa detalhada entre ${autor1} e ${autor2}, considerando:
+
+1. **Contexto histórico e social** em que viveram e o seu impacto nas suas obras
+2. **Temas recorrentes** na sua produção literária
+3. **Estilo narrativo e recursos literários** característicos de cada um
+4. **Obras mais representativas** e a sua relevância na literatura
+5. **Semelhanças e diferenças** notáveis entre ambos os autores
+6. **Legado e influência** em autores posteriores
+
+Analisa cada aspecto com exemplos concretos das suas obras para fundamentar as tuas observações. Apresenta a análise de forma estruturada e académica.`;
+            
+            try {
+                const url = `https://grok.com/?q=${encodeURIComponent(prompt)}`;
+                window.open(url, '_blank');
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Erro ao abrir a comparação. Tenta novamente.';
+                console.error('Erro:', error);
+            } finally {
+                // Restaurar botão após um pequeno delay
+                setTimeout(() => {
+                    btnComparar.disabled = false;
+                    btnComparar.textContent = 'Comparar';
+                }, 1000);
+            }
+        }
+        
+        // Adicionar funcionalidade Enter nos inputs
+        document.getElementById('autor1-comp-lit').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('autor2-comp-lit').focus();
+            }
+        });
+        
+        document.getElementById('autor2-comp-lit').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                abrirComparacao();
+            }
+        });
+        
+        // Limpar estilos de erro quando o usuário digita
+        function limparErro(input) {
+            input.style.borderColor = '#ccc';
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+        document.getElementById('autor1-comp-lit').addEventListener('input', function() {
+            limparErro(this);
+        });
+        
+        document.getElementById('autor2-comp-lit').addEventListener('input', function() {
+            limparErro(this);
+        });
+    </script>
+</body>
+</html>
